@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Community System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-card">
+            <h1 class="title">SMART COMMUNITY SYSTEM</h1>
+            <p class="subtitle">Connecting Communities, Empowering Lives</p>
+            
+            <div id="loginForm" class="form-container">
+                <h2>Login</h2>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+                <button onclick="showSignup()" class="btn btn-secondary">Sign Up</button>
+                
+                <div class="demo-accounts">
+                    <p class="demo-title">Demo Accounts:</p>
+                    <div class="demo-list">
+                        <div class="demo-item" onclick="fillCredentials('elderly1', 'elderly123')">
+                            <strong>Elderly:</strong> elderly1 / elderly123
+                        </div>
+                        <div class="demo-item" onclick="fillCredentials('caretaker1', 'care123')">
+                            <strong>Caretaker:</strong> caretaker1 / care123
+                        </div>
+                        <div class="demo-item" onclick="fillCredentials('organizer1', 'org123')">
+                            <strong>Organizer:</strong> organizer1 / org123
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="signupForm" class="form-container" style="display: none;">
+                <h2>Choose Your Account Type</h2>
+                <p class="signup-subtitle">Select the option that best describes you</p>
+                
+                <div class="user-type-grid">
+                    <div class="user-type-card" onclick="selectUserType('elderly')">
+                        <div class="user-type-icon">👴</div>
+                        <h3>Elderly</h3>
+                        <p>For senior citizens to access events and services</p>
+                    </div>
+                    
+                    <div class="user-type-card" onclick="selectUserType('caretaker')">
+                        <div class="user-type-icon">👨‍⚕️</div>
+                        <h3>Caretaker</h3>
+                        <p>For caregivers to monitor and assist elderly</p>
+                    </div>
+                    
+                    <div class="user-type-card" onclick="selectUserType('organizer')">
+                        <div class="user-type-icon">📋</div>
+                        <h3>Event Organizer</h3>
+                        <p>For organizers to create and manage events</p>
+                    </div>
+                </div>
+                
+                <button onclick="showLogin()" class="btn btn-secondary" style="margin-top: 20px;">Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Type Modal -->
+    <div id="userTypeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Complete Registration</h2>
+            <div class="modal-icon" id="modalIcon"></div>
+            <p id="modalDescription"></p>
+            
+            <form onsubmit="handleSignup(event)" class="modal-form">
+                <input type="hidden" id="selected-user-type" name="userType">
+                
+                <div class="form-group">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" name="username" required placeholder="Choose a username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" name="password" required placeholder="Choose a password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" name="fullname" required placeholder="Enter your full name">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
