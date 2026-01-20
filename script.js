@@ -1,7 +1,7 @@
 // Dummy user data
 const users = [
     { username: 'elderly1', password: 'elderly123', type: 'elderly', name: 'John Doe' },
-    { username: 'caretaker1', password: 'care123', type: 'caretaker', name: 'Sarah Smith' },
+    { username: 'caretaker1', password: 'care123', type: 'caretaker', name: 'Sarah Smith', assignedElderly: ['elderly1'] },
     { username: 'organizer1', password: 'org123', type: 'organizer', name: 'Mike Johnson' }
 ];
 
@@ -14,7 +14,8 @@ let events = [
         time: '08:00 AM',
         description: 'Gentle yoga exercises perfect for seniors to improve flexibility and balance.',
         category: 'elderly',
-        organizer: 'Mike Johnson'
+        organizer: 'Mike Johnson',
+        ratings: []
     },
     {
         id: 2,
@@ -23,7 +24,8 @@ let events = [
         time: '10:00 AM',
         description: 'Free health screening including blood pressure, glucose, and general wellness check.',
         category: 'elderly',
-        organizer: 'Mike Johnson'
+        organizer: 'Mike Johnson',
+        ratings: []
     },
     {
         id: 3,
@@ -32,7 +34,8 @@ let events = [
         time: '03:00 PM',
         description: 'Afternoon tea and conversation with fellow community members.',
         category: 'elderly',
-        organizer: 'Mike Johnson'
+        organizer: 'Mike Johnson',
+        ratings: []
     },
     {
         id: 4,
@@ -41,7 +44,8 @@ let events = [
         time: '02:00 PM',
         description: 'Creative workshop for seniors featuring painting and light crafts.',
         category: 'elderly',
-        organizer: 'Mike Johnson'
+        organizer: 'Mike Johnson',
+        ratings: []
     },
     {
         id: 5,
@@ -50,7 +54,8 @@ let events = [
         time: '11:00 AM',
         description: 'Relaxing music therapy to enhance mood and cognitive function.',
         category: 'elderly',
-        organizer: 'Mike Johnson'
+        organizer: 'Mike Johnson',
+        ratings: []
     }
 ];
 
@@ -69,6 +74,12 @@ const elderlyHealthData = {
     }
 };
 
+// Reminders storage
+let reminders = [
+    { id: 1, text: 'Morning Yoga Session tomorrow at 8:00 AM', time: '2026-01-21', dismissed: false },
+    { id: 2, text: 'Take medication - Aspirin 81mg', time: '2026-01-20', dismissed: false }
+];
+
 // Login form handler
 function handleLogin(event) {
     event.preventDefault();
@@ -79,32 +90,11 @@ function handleLogin(event) {
     const user = users.find(u => u.username === username && u.password === password);
     
     if (user) {
-        // Store user session
         sessionStorage.setItem('currentUser', JSON.stringify(user));
-        
-        // Redirect to dashboard
         window.location.href = 'dashboard.html';
     } else {
-        alert('Invalid username or password. Please try again or use one of the demo accounts.');
+        alert('Invalid username or password. Please try again.');
     }
-}
-
-// Show signup form
-function showSignup() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('signupForm').style.display = 'block';
-}
-
-// Show login form
-function showLogin() {
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('signupForm').style.display = 'none';
-}
-
-// Fill credentials (for demo accounts)
-function fillCredentials(username, password) {
-    document.getElementById('username').value = username;
-    document.getElementById('password').value = password;
 }
 
 // Select user type and open modal
@@ -114,26 +104,34 @@ function selectUserType(type) {
     const modalTitle = document.getElementById('modalTitle');
     const modalDescription = document.getElementById('modalDescription');
     const selectedUserType = document.getElementById('selected-user-type');
+    const elderlySelectGroup = document.getElementById('elderlySelectGroup');
     
-    // Set user type
     selectedUserType.value = type;
     
-    // Set modal content based on user type
     if (type === 'elderly') {
         modalIcon.textContent = '👴';
-        modalTitle.textContent = 'Elderly Account Registration';
+        modalTitle.textContent = 'Senior Account Registration';
         modalDescription.textContent = 'Create your account to access events and community services';
+        elderlySelectGroup.style.display = 'none';
     } else if (type === 'caretaker') {
-        modalIcon.textContent = '👨‍⚕️';
-        modalTitle.textContent = 'Caretaker Account Registration';
+        modalIcon.textContent = '🤲';
+        modalTitle.textContent = 'Caregiver Account Registration';
         modalDescription.textContent = 'Create your account to monitor and assist elderly members';
+        elderlySelectGroup.style.display = 'block';
+        
+        // Populate elderly select
+        const elderlySelect = document.getElementById('elderly-select');
+        elderlySelect.innerHTML = '<option value="">Select Elderly to Care For</option>';
+        users.filter(u => u.type === 'elderly').forEach(elderly => {
+            elderlySelect.innerHTML += `<option value="${elderly.username}">${elderly.name}</option>`;
+        });
     } else if (type === 'organizer') {
         modalIcon.textContent = '📋';
         modalTitle.textContent = 'Event Organizer Registration';
         modalDescription.textContent = 'Create your account to organize and manage community events';
+        elderlySelectGroup.style.display = 'none';
     }
     
-    // Show modal
     modal.style.display = 'block';
 }
 
@@ -142,7 +140,6 @@ function closeModal() {
     const modal = document.getElementById('userTypeModal');
     modal.style.display = 'none';
     
-    // Clear form
     document.getElementById('signup-username').value = '';
     document.getElementById('signup-password').value = '';
     document.getElementById('signup-name').value = '';
@@ -165,7 +162,6 @@ function handleSignup(event) {
     const fullname = document.getElementById('signup-name').value;
     const userType = document.getElementById('selected-user-type').value;
     
-    // Check if username already exists
     const existingUser = users.find(u => u.username === username);
     
     if (existingUser) {
@@ -173,7 +169,6 @@ function handleSignup(event) {
         return;
     }
     
-    // Create new user
     const newUser = {
         username: username,
         password: password,
@@ -181,13 +176,20 @@ function handleSignup(event) {
         name: fullname
     };
     
+    // Add assigned elderly for caretaker
+    if (userType === 'caretaker') {
+        const elderlySelect = document.getElementById('elderly-select').value;
+        if (elderlySelect) {
+            newUser.assignedElderly = [elderlySelect];
+        } else {
+            newUser.assignedElderly = [];
+        }
+    }
+    
     users.push(newUser);
     
     alert('Account created successfully! Please login with your credentials.');
-    
-    // Close modal and return to login
     closeModal();
-    showLogin();
 }
 
 // Logout
