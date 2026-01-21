@@ -1,7 +1,11 @@
 // Dummy user data
 const users = [
-    { username: 'elderly1', password: 'elderly123', type: 'elderly', name: 'John Doe' },
-    { username: 'caretaker1', password: 'care123', type: 'caretaker', name: 'Sarah Smith', assignedElderly: ['elderly1'] },
+    { username: 'elderly1', password: 'elderly123', type: 'elderly', name: 'John Doe', age: 72 },
+    { username: 'elderly2', password: 'elderly123', type: 'elderly', name: 'Mary Johnson', age: 68 },
+    { username: 'elderly3', password: 'elderly123', type: 'elderly', name: 'Robert Smith', age: 75 },
+    { username: 'elderly4', password: 'elderly123', type: 'elderly', name: 'Patricia Brown', age: 70 },
+    { username: 'elderly5', password: 'elderly123', type: 'elderly', name: 'James Wilson', age: 77 },
+    { username: 'caretaker1', password: 'care123', type: 'caretaker', name: 'Sarah Smith', assignedElderly: ['elderly1', 'elderly2'] },
     { username: 'organizer1', password: 'org123', type: 'organizer', name: 'Mike Johnson' }
 ];
 
@@ -71,6 +75,50 @@ const elderlyHealthData = {
         medications: ['Aspirin 81mg', 'Lisinopril 10mg'],
         allergies: ['Penicillin'],
         emergencyContact: 'Jane Doe (Daughter) - +60123456789'
+    },
+    elderly2: {
+        name: 'Mary Johnson',
+        age: 68,
+        bloodPressure: '125/80',
+        heartRate: '72 bpm',
+        glucose: '105 mg/dL',
+        lastCheckup: '2026-01-10',
+        medications: ['Metformin 500mg', 'Atorvastatin 20mg'],
+        allergies: ['None'],
+        emergencyContact: 'Tom Johnson (Son) - +60198765432'
+    },
+    elderly3: {
+        name: 'Robert Smith',
+        age: 75,
+        bloodPressure: '135/90',
+        heartRate: '78 bpm',
+        glucose: '115 mg/dL',
+        lastCheckup: '2026-01-12',
+        medications: ['Amlodipine 5mg', 'Warfarin 2mg'],
+        allergies: ['Sulfa drugs'],
+        emergencyContact: 'Lisa Smith (Daughter) - +60187654321'
+    },
+    elderly4: {
+        name: 'Patricia Brown',
+        age: 70,
+        bloodPressure: '128/82',
+        heartRate: '70 bpm',
+        glucose: '108 mg/dL',
+        lastCheckup: '2026-01-18',
+        medications: ['Levothyroxine 50mcg', 'Calcium 600mg'],
+        allergies: ['Latex'],
+        emergencyContact: 'Michael Brown (Son) - +60176543210'
+    },
+    elderly5: {
+        name: 'James Wilson',
+        age: 77,
+        bloodPressure: '138/88',
+        heartRate: '80 bpm',
+        glucose: '120 mg/dL',
+        lastCheckup: '2026-01-08',
+        medications: ['Ramipril 5mg', 'Metoprolol 50mg', 'Furosemide 40mg'],
+        allergies: ['Iodine'],
+        emergencyContact: 'Emily Wilson (Daughter) - +60165432109'
     }
 };
 
@@ -121,7 +169,9 @@ function selectUserType(type) {
         
         // Populate elderly select
         const elderlySelect = document.getElementById('elderly-select');
-        elderlySelect.innerHTML = '<option value="">Select Elderly to Care For</option>';
+        elderlySelect.innerHTML = '<option value="">Select Elderly to Care For (Hold Ctrl/Cmd for multiple)</option>';
+        elderlySelect.multiple = true;
+        elderlySelect.size = 5;
         users.filter(u => u.type === 'elderly').forEach(elderly => {
             elderlySelect.innerHTML += `<option value="${elderly.username}">${elderly.name}</option>`;
         });
@@ -178,12 +228,9 @@ function handleSignup(event) {
     
     // Add assigned elderly for caretaker
     if (userType === 'caretaker') {
-        const elderlySelect = document.getElementById('elderly-select').value;
-        if (elderlySelect) {
-            newUser.assignedElderly = [elderlySelect];
-        } else {
-            newUser.assignedElderly = [];
-        }
+        const elderlySelect = document.getElementById('elderly-select');
+        const selectedOptions = Array.from(elderlySelect.selectedOptions).map(opt => opt.value);
+        newUser.assignedElderly = selectedOptions.length > 0 ? selectedOptions : [];
     }
     
     users.push(newUser);

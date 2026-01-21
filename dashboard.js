@@ -29,26 +29,25 @@ function initDashboard() {
 
 // Load Elderly Dashboard
 function loadElderlyDashboard() {
-    // Show SOS button
     document.getElementById('sosButton').style.display = 'block';
-    
-    // Show voice control
     document.getElementById('voiceControl').style.display = 'block';
     
     const contentArea = document.getElementById('contentArea');
     contentArea.innerHTML = `
+        <div class="card" style="grid-column: 1 / -1; margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span style="font-size: 20px;">🔍</span>
+                <input type="text" id="eventSearchInput" placeholder="Search upcoming events..." 
+                       onkeyup="filterEvents()" 
+                       style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none;">
+            </div>
+        </div>
+
         <div class="card">
             <h3>📅 Event Calendar</h3>
-            <div id="calendar"></div>
-            <div class="calendar-legend">
-                <div class="legend-item">
-                    <div class="legend-color legend-elderly"></div>
-                    <span>Elderly Events</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color legend-general"></div>
-                    <span>General Events</span>
-                </div>
+            <div id="calendar"></div> <div class="calendar-legend">
+                <div class="legend-item"><div class="legend-color legend-elderly"></div><span>Elderly</span></div>
+                <div class="legend-item"><div class="legend-color legend-general"></div><span>General</span></div>
             </div>
         </div>
         
@@ -70,26 +69,26 @@ function loadElderlyDashboard() {
 
 // Load Caretaker Dashboard
 function loadCaretakerDashboard() {
-    // Show SOS button
     document.getElementById('sosButton').style.display = 'block';
-    
-    // Show voice control
     document.getElementById('voiceControl').style.display = 'block';
     
     const contentArea = document.getElementById('contentArea');
     contentArea.innerHTML = `
+        <div class="card" style="grid-column: 1 / -1; margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span style="font-size: 20px;">🔍</span>
+                <input type="text" id="eventSearchInput" placeholder="Search all events..." 
+                       onkeyup="filterEvents()" 
+                       style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none;">
+            </div>
+        </div>
+
         <div class="card">
             <h3>📅 Event Calendar</h3>
             <div id="calendar"></div>
             <div class="calendar-legend">
-                <div class="legend-item">
-                    <div class="legend-color legend-elderly"></div>
-                    <span>Elderly Events</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color legend-general"></div>
-                    <span>General Events</span>
-                </div>
+                <div class="legend-item"><div class="legend-color legend-elderly"></div><span>Elderly Events</span></div>
+                <div class="legend-item"><div class="legend-color legend-general"></div><span>General Events</span></div>
             </div>
         </div>
         
@@ -119,6 +118,15 @@ function loadCaretakerDashboard() {
 function loadOrganizerDashboard() {
     const contentArea = document.getElementById('contentArea');
     contentArea.innerHTML = `
+        <div class="card" style="grid-column: 1 / -1; margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span style="font-size: 20px;">🔍</span>
+                <input type="text" id="eventSearchInput" placeholder="Search through all created events..." 
+                       onkeyup="filterAllEventsForOrganizer()" 
+                       style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none;">
+            </div>
+        </div>
+
         <div class="card">
             <h3>➕ Add New Event</h3>
             <form class="form-add-event" onsubmit="addEvent(event)">
@@ -328,7 +336,8 @@ function loadAllEvents() {
     }).join('');
 }
 
-// Add Event (Organizer)
+
+// Add Event
 function addEvent(e) {
     e.preventDefault();
     
@@ -341,20 +350,21 @@ function addEvent(e) {
         time: document.getElementById('eventTime').value,
         description: document.getElementById('eventDescription').value,
         category: document.getElementById('eventCategory').value,
-        organizer: user.name
+        organizer: user.name,
+        ratings: []
     };
     
     events.push(newEvent);
     
-    // Clear form
     document.getElementById('eventTitle').value = '';
     document.getElementById('eventDate').value = '';
     document.getElementById('eventTime').value = '';
     document.getElementById('eventDescription').value = '';
     document.getElementById('eventCategory').value = '';
     
-    // Reload events
     loadAllEvents();
+    loadSearchResults();
+    loadCalendar();
     
     alert('Event added successfully!');
 }
@@ -367,7 +377,6 @@ function handleSOS() {
 
 // Voice Command
 let isListening = false;
-let recognition;
 
 function toggleVoiceCommand() {
     if (!isListening) {
@@ -387,13 +396,12 @@ function startListening() {
     voiceText.textContent = 'Listening...';
     voiceFeedback.textContent = '🎤 Listening for your command...';
     
-    // Simulate voice recognition (since actual speech recognition requires HTTPS)
     setTimeout(() => {
         const commands = [
             'Show upcoming events',
             'Show calendar',
-            'Read events for elderly',
-            'Show health information'
+            'Show reminders',
+            'Search events'
         ];
         
         const randomCommand = commands[Math.floor(Math.random() * commands.length)];
@@ -425,13 +433,19 @@ function processVoiceCommand(command) {
     const lowerCommand = command.toLowerCase();
     
     if (lowerCommand.includes('event')) {
-        document.querySelector('#upcomingEvents').scrollIntoView({ behavior: 'smooth' });
+        const eventsSection = document.querySelector('#upcomingEvents');
+        if (eventsSection) eventsSection.scrollIntoView({ behavior: 'smooth' });
     } else if (lowerCommand.includes('calendar')) {
-        document.querySelector('#calendar').scrollIntoView({ behavior: 'smooth' });
-    } else if (lowerCommand.includes('health')) {
-        const healthSection = document.querySelector('#healthInfo');
-        if (healthSection) {
-            healthSection.scrollIntoView({ behavior: 'smooth' });
+        const calendarSection = document.querySelector('#calendar');
+        if (calendarSection) calendarSection.scrollIntoView({ behavior: 'smooth' });
+    } else if (lowerCommand.includes('reminder')) {
+        const remindersSection = document.querySelector('#reminders');
+        if (remindersSection) remindersSection.scrollIntoView({ behavior: 'smooth' });
+    } else if (lowerCommand.includes('search')) {
+        const searchSection = document.querySelector('#searchInput');
+        if (searchSection) {
+            searchSection.scrollIntoView({ behavior: 'smooth' });
+            searchSection.focus();
         }
     }
 }
@@ -441,6 +455,71 @@ function formatDate(dateStr) {
     const date = new Date(dateStr);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
+}
+
+function filterEvents() {
+    const searchTerm = document.getElementById('eventSearchInput').value.toLowerCase();
+    const upcomingDiv = document.getElementById('upcomingEvents');
+    const today = new Date();
+    
+    // Check if the events array exists (it should be in your script.js)
+    if (typeof events === 'undefined') return;
+
+    const filtered = events.filter(event => {
+        const isUpcoming = new Date(event.date) >= today;
+        const matches = event.title.toLowerCase().includes(searchTerm) || 
+                        event.description.toLowerCase().includes(searchTerm);
+        return isUpcoming && matches;
+    });
+
+    if (filtered.length === 0) {
+        upcomingDiv.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No events match your search.</p>';
+        return;
+    }
+
+    upcomingDiv.innerHTML = filtered.map(event => {
+        const tagColor = event.category === 'elderly' ? '#28a745' : '#17a2b8';
+        return `
+            <div class="event-item" style="border-left-color: ${tagColor}; margin-bottom: 10px; padding: 10px; border-left-width: 5px; background: #fdfdfd;">
+                <h4 style="margin: 0;">${event.title}</h4>
+                <div style="font-size: 12px; color: #666;">📅 ${formatDate(event.date)}</div>
+                <p style="margin: 5px 0; font-size: 14px;">${event.description}</p>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterAllEventsForOrganizer() {
+    const searchTerm = document.getElementById('eventSearchInput').value.toLowerCase();
+    const allEventsDiv = document.getElementById('allEvents');
+    
+    if (typeof events === 'undefined') return;
+
+    const filtered = events.filter(event => 
+        event.title.toLowerCase().includes(searchTerm) || 
+        event.description.toLowerCase().includes(searchTerm) ||
+        event.organizer.toLowerCase().includes(searchTerm)
+    );
+
+    if (filtered.length === 0) {
+        allEventsDiv.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No events match your search.</p>';
+        return;
+    }
+
+    allEventsDiv.innerHTML = filtered.map(event => {
+        const tagColor = event.category === 'elderly' ? '#28a745' : '#17a2b8';
+        return `
+            <div class="event-item" style="border-left-color: ${tagColor}">
+                <h4>${event.title}</h4>
+                <div class="event-date">📅 ${formatDate(event.date)} at ${event.time}</div>
+                <div class="event-description">${event.description}</div>
+                <span class="event-tag" style="background: ${tagColor}">
+                    ${event.category === 'elderly' ? 'Senior Friendly' : 'General'}
+                </span>
+                <span class="event-tag" style="background: #6c757d;">By: ${event.organizer}</span>
+            </div>
+        `;
+    }).join('');
 }
 
 // Initialize on page load

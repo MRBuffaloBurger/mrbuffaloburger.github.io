@@ -163,6 +163,63 @@ body {
     animation: fadeIn 0.3s;
 }
 
+ /* Container for the calendar */
+/* Container must be allowed to use full width */
+.card {
+    overflow: hidden; /* Prevent child overflow */
+}
+
+#calendar {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.calendar-grid {
+    display: grid;
+    /* This line is the key: minmax(0, 1fr) prevents columns from overflowing */
+    grid-template-columns: repeat(7, minmax(0, 1fr)); 
+    gap: 2px;
+    width: 100%;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    box-sizing: border-box; /* Includes border in width calculation */
+}
+
+.calendar-day, .calendar-grid div[style*="font-weight"] {
+    background: white;
+    padding: 8px 0; /* Vertical padding only to save horizontal space */
+    text-align: center;
+    font-size: 13px; /* Slightly smaller font to fit better */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0; /* Crucial for grid shrinking */
+    box-sizing: border-box;
+}
+
+/* Ensure day headers fit */
+.calendar-grid div[style*="font-weight: 600"] {
+    font-weight: bold !important;
+    background: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Circular highlights for events */
+.calendar-day.has-event {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.event-elderly { background-color: #28a745 !important; color: white; }
+.event-general { background-color: #17a2b8 !important; color: white; }
+.event-multiple { background-color: #ffc107 !important; color: #333; }
+
+/* Highlight for today */
+.calendar-day.today {
+    border: 2px solid #667eea;
+    background-color: #eef2ff;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -916,3 +973,7 @@ body {
         flex-direction: column;
     }
 }
+
+
+
+
